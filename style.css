@@ -1,0 +1,53 @@
+body{
+  font-family: monospace,Helvetica, sans-serif;
+  background-color: #292929;
+  color: #fff7f7;
+  margin: 0;
+  padding: 0;
+}
+
+#content{
+  height: 100%;
+  width: 100%;
+}
+
+#main{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 80%;
+  flex-direction: column;
+}
+
+#gb-frame{
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  grid-template-rows: repeat(3,1fr);
+  border: solid 2px #CCCCCC;
+}
+
+.cell{
+  color: #2E86AB;
+  background-color: #222222;
+  border: 1px solid #CCCCCC;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.win-cell{
+  background-color: #070707;
+  font-weight: bold;
+  font-size: 1.4rem;
+}
+
+.player-one-mark{
+ color: #2E86AB;
+}
+
+.player-two-mark{
+  color:  #FF3E4D;
+}
