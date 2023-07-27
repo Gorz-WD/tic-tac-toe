@@ -3,15 +3,18 @@ const gb = (function () {
 
   const reset = () => board = board.fill('')
 
-  return{board, reset}
+  return { board, reset }
 })()
 
 const dc = (function () {
   const gbFrame = document.getElementById('gb-frame')
+  const result = document.getElementById('result')
+  const pOneName = document.getElementById('player-one-name')
+  const pTwoName = document.getElementById('player-two-name')
   let wincells = []
 
   const render = (gb) => {
-    gb.forEach((cell , index) => {
+    gb.forEach((cell, index) => {
       const div = document.createElement('div')
       div.textContent = cell
       div.classList.add('cell')
@@ -36,21 +39,28 @@ const dc = (function () {
 
   const reset = () => {
     gbFrame.textContent = ''
+    result.textContent = ''
   }
-  
-  return {render, reset, setWinCells, paintCells}
+
+  const showWinner = (x) => result.textContent = `${x} Wins`
+  const showTie = () => result.textContent = 'Its Tie'
+  const showPlayerOneName = (x) => pOneName.textContent = x
+  const showPlayerTwoName = (x) => pTwoName.textContent = x
+
+
+  return { render, reset, setWinCells, paintCells, showWinner, showTie , showPlayerOneName, showPlayerTwoName }
 })()
 
 const Player = (name, mark) => {
   let cells = []
-  
+
   const getName = () => name
   const getMark = () => mark
   const getCells = () => cells
   const addCell = (x) => cells.push(x)
   const reset = () => cells = []
 
-  return {getName, getMark, getCells, addCell, reset}
+  return { getName, getMark, getCells, addCell, reset }
 }
 
 function game() {
@@ -58,8 +68,11 @@ function game() {
   dc.render(gb.board);
   const restart = document.getElementById('restart')
   const cells = document.getElementsByClassName('cell');
-  const playerOne = Player('P1', 'X');
-  const playerTwo = Player('P2', 'O');
+  const playerOne = Player('Player 1', 'X');
+  const playerTwo = Player('Player 2', 'O');
+  dc.showPlayerOneName(playerOne.getName())
+  dc.showPlayerTwoName(playerTwo.getName())
+
   let currentPlayer = playerOne;
 
   function checkWinner(p) {
@@ -69,21 +82,34 @@ function game() {
       [3, 4, 5], [2, 4, 6], [2, 5, 8],
       [1, 4, 7], [6, 7, 8]
     ];
-  
+
     for (const wincon of wincons) {
       const foundWincon = wincon.every(index => arr.includes(index));
       if (foundWincon) {
         dc.setWinCells(wincon)
         return true;
       }
-    } 
+    }
+  }
+
+  function checkDraw() {
+    const cellsOccupied = playerOne.getCells().length + playerTwo.getCells().length;
+    const allCells = gb.board.length;
+
+    return cellsOccupied === allCells && !checkWinner(playerOne) && !checkWinner(playerTwo);
   }
 
   const gameOver = (p) => {
-    dc.paintCells()
     Array.from(cells).forEach(cell => {
       cell.removeEventListener('click', cellClickHandler);
     });
+
+    if (p) {
+      dc.showWinner(p.getName())
+      dc.paintCells()
+    } else {
+      dc.showTie()
+    }
   }
 
   function resetGame() {
@@ -102,11 +128,15 @@ function game() {
 
   function cellClickHandler() {
     const cell = this;
+
     cell.textContent = currentPlayer.getMark();
     currentPlayer.addCell(Number(cell.id));
     currentPlayer === playerOne ? cell.classList.add('player-one-mark') : cell.classList.add('player-two-mark')
+
     if (checkWinner(currentPlayer)) {
       gameOver(currentPlayer);
+    } else if (checkDraw()) {
+      gameOver(null);
     } else {
       currentPlayer = currentPlayer === playerOne ? playerTwo : playerOne;
     }
